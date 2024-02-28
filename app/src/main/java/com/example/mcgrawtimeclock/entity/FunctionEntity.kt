@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "Function")
 data class FunctionEntity (
     @SerializedName("FunctionNo") @ColumnInfo("FunctionNo") @PrimaryKey(autoGenerate = false) val functionNo: Int,
-    @SerializedName("Description") @ColumnInfo("Description") val description: Int,
-    @SerializedName("Enabled") @ColumnInfo("Enabled") val enabled: Int,
+    @SerializedName("Description") @ColumnInfo("Description") val description: String,
+    @SerializedName("Enabled") @ColumnInfo("Enabled") val enabled: String,
     @SerializedName("DepartmentNo") @ColumnInfo("DepartmentNo") val departmentNo: Int
 )

@@ -19,8 +19,8 @@ object Utils {
 
         builder.setMessage(message)
 
-        builder.setPositiveButton(android.R.string.ok) { _, _ ->
-        }
+        //builder.setPositiveButton(android.R.string.ok) { _, _ ->
+        //}
 
         val toneGen = ToneGenerator(AudioManager.STREAM_ALARM, 100)
         toneGen.startTone(ToneGenerator.TONE_SUP_ERROR, 500)

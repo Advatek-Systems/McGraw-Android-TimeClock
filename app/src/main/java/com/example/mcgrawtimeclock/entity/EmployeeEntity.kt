@@ -11,7 +11,6 @@ data class EmployeeEntity(
     @SerializedName("Card") @ColumnInfo("Card") val card: Int,
     @SerializedName("First_Name") @ColumnInfo("FirstName") val firstName: String,
     @SerializedName("Last_Name") @ColumnInfo("LastName") val lastName: String,
-    @SerializedName("Category") @ColumnInfo("Category") val category: Int,
     @SerializedName("Reg_Dept") @ColumnInfo("RegDept") val regDept: Int,
     @SerializedName("Supervisor") @ColumnInfo("Supervisor") val supervisor: Int,
 )
