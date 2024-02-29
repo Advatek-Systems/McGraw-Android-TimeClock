@@ -8,4 +8,52 @@
 
     <include layout="@layout/common_image_layout" />
 
+    <Button
+        android:id="@+id/btnClockIn"
+        android:layout_width="900dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="28dp"
+        android:backgroundTint="#349F16"
+        android:text="In"
+        android:textSize="80dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnSwitch"
+        android:layout_width="900dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="356dp"
+        android:backgroundTint="#535353"
+        android:text="Switch"
+        android:textSize="80dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnClockOut"
+        android:layout_width="900dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="192dp"
+        android:backgroundTint="#8F1616"
+        android:text="Out"
+        android:textSize="80dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtWelcomeText"
+        android:layout_width="656dp"
+        android:layout_height="62dp"
+        android:layout_marginTop="516dp"
+        android:text=""
+        android:gravity="center"
+        android:textSize="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

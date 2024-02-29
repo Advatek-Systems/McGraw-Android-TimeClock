@@ -1,20 +1,12 @@
 package com.example.mcgrawtimeclock.service
 
-import android.annotation.SuppressLint
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
-import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import com.example.mcgrawtimeclock.MainActivity
-import com.example.mcgrawtimeclock.R
 import com.example.mcgrawtimeclock.api.ApiService
 import com.example.mcgrawtimeclock.employeeDao
 import com.example.mcgrawtimeclock.functionDao
@@ -23,6 +15,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
+
 
 class SyncService : Service() {
     private val TAG: String = "SyncService"
@@ -35,15 +28,14 @@ class SyncService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d(TAG, "Service onCreate")
+        logError("Service Started")
         timer = Timer()
-        startForegroundService()
         startSyncTimer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "Service onDestroy")
+        logError("Service Stopped")
         timer.cancel()
     }
 
@@ -55,6 +47,7 @@ class SyncService : Service() {
                 }
             }
         }, 0, SYNC_INTERVAL)
+
     }
 
     private fun syncDataIfConnected() {
@@ -74,10 +67,10 @@ class SyncService : Service() {
                         if (!employeeList.isNullOrEmpty()) {
                             employeeList.forEach {
                                 if (employeeDao.doesEmployeeExist(it.emplNo) == 0) {
-                                    employeeDao.insertEmployee(it.emplNo, it.card, it.firstName, it.lastName, it.regDept, it.supervisor)
+                                    employeeDao.insertEmployee(it.emplNo, it.card, it.firstName, it.lastName, it.regDept, it.supervisor, it.category)
                                     logError("Employee inserted")
                                 } else {
-                                    employeeDao.updateEmployee(it.emplNo, it.card, it.firstName, it.lastName, it.regDept, it.supervisor)
+                                    employeeDao.updateEmployee(it.emplNo, it.card, it.firstName, it.lastName, it.regDept, it.supervisor, it.category)
                                     logError("Employee updated")
                                 }
                             }
@@ -111,8 +104,6 @@ class SyncService : Service() {
                     logError("Error Fell into catch: " + e.message)
                 }
             }
-        } else {
-            Log.d(TAG, "No internet connectivity")
         }
     }
 
@@ -127,42 +118,7 @@ class SyncService : Service() {
         return networkInfo != null && networkInfo.isConnected
     }
 
-    @SuppressLint("ForegroundServiceType")
-    private fun startForegroundService() {
-        val channelId =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                createNotificationChannel("sync_service", "Sync Service")
-            } else {
-                ""
-            }
-
-        val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Sync Service")
-            .setContentText("Running...")
-            .setSmallIcon(R.drawable.advateksystemstriangle)
-            .setContentIntent(getPendingIntent())
-            .build()
-
-        startForeground(NOTIFICATION_ID, notificationBuilder)
-    }
-
-    private fun createNotificationChannel(channelId: String, channelName: String): String {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT)
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-            return channelId
-        }
-        return ""
-    }
-
-    private fun getPendingIntent(): PendingIntent {
-        val intent = Intent(this, MainActivity::class.java)
-        return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-    }
-
     companion object {
-        private const val SYNC_INTERVAL: Long = 60000 // 1 minute in milliseconds
-        private const val NOTIFICATION_ID = 1
+        private const val SYNC_INTERVAL: Long = 60000 // 1 minutes in milliseconds
     }
 }

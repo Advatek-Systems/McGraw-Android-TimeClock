@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         binding.txtScanCard.addTextChangedListener { text ->
             if (!isTextCleared) {
                 if (text.isNullOrEmpty() || text.isNullOrBlank()) {
-                    Utils.showErrorBox(applicationContext, "ID Card Required!", "ID Card is required and cannot be left blank!")
+                    Utils.showErrorBox(this, "ID Card Required!", "ID Card is required and cannot be left blank!")
                     isTextCleared = true
                     binding.txtScanCard.setText("")
                     binding.txtScanCard.requestFocus()
@@ -78,7 +78,8 @@ class MainActivity : AppCompatActivity() {
                 if (text.length == 9) {
                     var index = text.indexOf(':')
                     var input = text.substring(index + 1, text.length)
-                    if (employeeDao.doesEmployeeExist(input.toInt()) == 0) {
+                    var intInput = input.toInt()
+                    if (employeeDao.validateCardNo(intInput) == 0) {
                         Utils.showErrorBox(this, "Error", "Invalid card number, please try again!")
                         isTextCleared = true
                         binding.txtScanCard.setText("")
@@ -91,7 +92,7 @@ class MainActivity : AppCompatActivity() {
                         binding.txtScanCard.requestFocus()
                         isTextCleared = false
                         val intent = Intent(this, ClockInOut::class.java)
-                        intent.putExtra("productID", 3)
+                        intent.putExtra("cardNumber", intInput)
                         startActivity(intent)
                     }
                 }

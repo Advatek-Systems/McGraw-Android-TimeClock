@@ -10,17 +10,40 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import com.example.mcgrawtimeclock.databinding.ActivityMainBinding
+import java.net.NetworkInterface
+import java.net.SocketException
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 object Utils {
-    fun showErrorBox(context: Context, title: String, message: String) {
+    fun showSuccessBox(context: Context, title: String, message: String, callback: (() -> Unit)? = null) {
         val builder = AlertDialog.Builder(context)
 
         builder.setTitle(title)
 
         builder.setMessage(message)
 
-        //builder.setPositiveButton(android.R.string.ok) { _, _ ->
-        //}
+        val toneGen = ToneGenerator(AudioManager.STREAM_ALARM, 100)
+        toneGen.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 500)
+        toneGen.startTone(ToneGenerator.TONE_PROP_ACK, 500)
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        val handler = Handler()
+        handler.postDelayed({
+            alertDialog.dismiss()
+            callback?.invoke()
+        }, 3000)
+    }
+
+    fun showErrorBox(context: Context, title: String, message: String) {
+        val builder = AlertDialog.Builder(context)
+
+        builder.setTitle(title)
+
+        builder.setMessage(message)
 
         val toneGen = ToneGenerator(AudioManager.STREAM_ALARM, 100)
         toneGen.startTone(ToneGenerator.TONE_SUP_ERROR, 500)
@@ -46,5 +69,36 @@ object Utils {
         activity.supportActionBar?.hide()
         val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
+    }
+
+    fun getCurrentDateAsInt(): Int {
+        val currentDate = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("yyMMdd")
+        return currentDate.format(formatter).toInt()
+    }
+
+    fun getCurrentTimeAsInt(): Int {
+        val currentTime = LocalTime.now()
+        val formatter = DateTimeFormatter.ofPattern("HHmmss")
+        return currentTime.format(formatter).toInt()
+    }
+
+    fun getLocalIpAddress(): String {
+        try {
+            val interfaces = NetworkInterface.getNetworkInterfaces()
+            while (interfaces.hasMoreElements()) {
+                val networkInterface = interfaces.nextElement()
+                val addresses = networkInterface.inetAddresses
+                while (addresses.hasMoreElements()) {
+                    val address = addresses.nextElement()
+                    if (!address.isLoopbackAddress && address.hostAddress.contains(":").not()) {
+                        return address.hostAddress
+                    }
+                }
+            }
+        } catch (ex: SocketException) {
+            ex.printStackTrace()
+        }
+        return ""
     }
 }
