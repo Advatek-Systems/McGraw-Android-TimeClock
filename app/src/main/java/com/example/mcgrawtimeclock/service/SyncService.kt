@@ -10,8 +10,12 @@ import android.util.Log
 import com.example.mcgrawtimeclock.api.ApiService
 import com.example.mcgrawtimeclock.employeeDao
 import com.example.mcgrawtimeclock.functionDao
+import com.example.mcgrawtimeclock.transDao
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
@@ -55,7 +59,7 @@ class SyncService : Service() {
             MainScope().launch {
                 try {
                     val retrofit = Retrofit.Builder()
-                        .baseUrl("http://10.1.5.200:45455/api/")
+                        .baseUrl("http://192.168.2.3/McGrawAPI/api/")
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
 
@@ -99,6 +103,26 @@ class SyncService : Service() {
                         }
                     } else {
                         logError("102 - API error (non 200 status)")
+                    }
+
+                    val transactions = transDao.getUnsentTransRecords()
+                    transactions.forEach{
+                        val call = apiService.insertTrans(it)
+
+                        call.enqueue(object : Callback<Void> {
+                            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                if (response.isSuccessful) {
+                                    transDao.updateSentStatus(it.transID)
+                                    logError("Transaction Inserted")
+                                } else {
+                                    logError("103 - ${it.transID} - (non 200 status)")
+                                }
+                            }
+
+                            override fun onFailure(call: Call<Void>, t: Throwable) {
+                                logError("103 - Transaction Upload Error")
+                            }
+                        })
                     }
                 } catch (e: Exception) {
                     logError("Error Fell into catch: " + e.message)

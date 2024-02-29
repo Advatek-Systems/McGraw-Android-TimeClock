@@ -25,8 +25,8 @@ object Utils {
         builder.setMessage(message)
 
         val toneGen = ToneGenerator(AudioManager.STREAM_ALARM, 100)
-        toneGen.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 500)
-        toneGen.startTone(ToneGenerator.TONE_PROP_ACK, 500)
+        toneGen.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 1000)
+        toneGen.startTone(ToneGenerator.TONE_PROP_ACK, 1000)
 
         val alertDialog = builder.create()
         alertDialog.show()
@@ -35,10 +35,10 @@ object Utils {
         handler.postDelayed({
             alertDialog.dismiss()
             callback?.invoke()
-        }, 3000)
+        }, 500)
     }
 
-    fun showErrorBox(context: Context, title: String, message: String) {
+    fun showErrorBox(context: Context, title: String, message: String, callback: (() -> Unit)? = null) {
         val builder = AlertDialog.Builder(context)
 
         builder.setTitle(title)
@@ -46,8 +46,8 @@ object Utils {
         builder.setMessage(message)
 
         val toneGen = ToneGenerator(AudioManager.STREAM_ALARM, 100)
-        toneGen.startTone(ToneGenerator.TONE_SUP_ERROR, 500)
-        toneGen.startTone(ToneGenerator.TONE_SUP_BUSY, 500)
+        toneGen.startTone(ToneGenerator.TONE_SUP_ERROR, 1000)
+        toneGen.startTone(ToneGenerator.TONE_SUP_BUSY, 1000)
 
         val alertDialog = builder.create()
         alertDialog.show()
@@ -55,7 +55,8 @@ object Utils {
         val handler = Handler()
         handler.postDelayed({
             alertDialog.dismiss()
-        }, 3000)
+            callback?.invoke()
+        }, 5000)
     }
 
     fun <T : ViewBinding> setupActivityUI(activity: AppCompatActivity, binding: T) {

@@ -7,6 +7,7 @@ import android.media.ToneGenerator
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -30,6 +31,8 @@ import kotlinx.coroutines.withContext
 lateinit var employeeDao: EmployeeDAO
 lateinit var functionDao: FunctionDAO
 lateinit var transDao: TransDAO
+
+var finishToMain: Boolean = false
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,16 +66,14 @@ class MainActivity : AppCompatActivity() {
 
         binding.txtScanCard.requestFocus()
 
-        var isTextCleared = false
-        binding.txtScanCard.addTextChangedListener { text ->
-            if (!isTextCleared) {
+        binding.txtScanCard.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
+                var text = binding.txtScanCard.text.toString()
                 if (text.isNullOrEmpty() || text.isNullOrBlank()) {
                     Utils.showErrorBox(this, "ID Card Required!", "ID Card is required and cannot be left blank!")
-                    isTextCleared = true
                     binding.txtScanCard.setText("")
                     binding.txtScanCard.requestFocus()
-                    isTextCleared = false
-                    return@addTextChangedListener
+                    return@OnKeyListener true
                 }
 
                 if (text.length == 9) {
@@ -81,23 +82,27 @@ class MainActivity : AppCompatActivity() {
                     var intInput = input.toInt()
                     if (employeeDao.validateCardNo(intInput) == 0) {
                         Utils.showErrorBox(this, "Error", "Invalid card number, please try again!")
-                        isTextCleared = true
                         binding.txtScanCard.setText("")
                         binding.txtScanCard.requestFocus()
-                        isTextCleared = false
-                        return@addTextChangedListener
+                        return@OnKeyListener true
                     } else {
-                        isTextCleared = true
                         binding.txtScanCard.setText("")
                         binding.txtScanCard.requestFocus()
-                        isTextCleared = false
                         val intent = Intent(this, ClockInOut::class.java)
                         intent.putExtra("cardNumber", intInput)
                         startActivity(intent)
                     }
                 }
+                return@OnKeyListener true
             }
-        }
+            false
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (finishToMain)
+            finishToMain = false
     }
 
     private fun instantiateEmployeeDatabase(): EmployeeDatabase{

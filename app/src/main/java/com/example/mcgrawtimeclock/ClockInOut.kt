@@ -43,9 +43,15 @@ class ClockInOut : AppCompatActivity() {
         }
 
         binding.btnSwitch.setOnClickListener {
-            val intent = Intent(this, SwitchFunction::class.java)
+            val intent = Intent(this, SupervisorPermission::class.java)
             intent.putExtra("cardNumber", cardNo)
             startActivity(intent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (finishToMain)
+            finish()
     }
 }
