@@ -76,6 +76,22 @@ class MainActivity : AppCompatActivity() {
                     return@OnKeyListener true
                 }
 
+                if (text.length <= 5 && !text.contains(":")) {
+                    var intInput = text.toInt()
+                    if (employeeDao.validateCardNo(intInput) == 0) {
+                        Utils.showErrorBox(this, "Error", "Invalid card number, please try again!")
+                        binding.txtScanCard.setText("")
+                        binding.txtScanCard.requestFocus()
+                        return@OnKeyListener true
+                    } else {
+                        binding.txtScanCard.setText("")
+                        binding.txtScanCard.requestFocus()
+                        val intent = Intent(this, ClockInOut::class.java)
+                        intent.putExtra("cardNumber", intInput)
+                        startActivity(intent)
+                    }
+                }
+
                 if (text.length == 9) {
                     var index = text.indexOf(':')
                     var input = text.substring(index + 1, text.length)
@@ -93,6 +109,14 @@ class MainActivity : AppCompatActivity() {
                         startActivity(intent)
                     }
                 }
+
+                if (text.length > 9) {
+                    Utils.showErrorBox(this, "ID Card Required!", "ID Card is required and cannot be left blank!")
+                    binding.txtScanCard.setText("")
+                    binding.txtScanCard.requestFocus()
+                    return@OnKeyListener true
+                }
+
                 return@OnKeyListener true
             }
             false
