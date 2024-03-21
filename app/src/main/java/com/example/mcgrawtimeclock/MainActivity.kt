@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                if (text.length == 9) {
+                if (text.contains(":")) {
                     var index = text.indexOf(':')
                     var input = text.substring(index + 1, text.length)
                     var intInput = input.toInt()
